@@ -165,8 +165,8 @@
             </div>
             
             <div class="input-group">
-                <label for="higherDuty">New Higher Duty Rate (%)</label>
-                <input type="number" id="higherDuty" step="0.01" placeholder="Enter new higher duty rate" oninput="calculate()">
+                <label for="higherDuty">Additional Duty Rate Increase (%)</label>
+                <input type="number" id="higherDuty" step="0.01" placeholder="Enter additional duty rate increase" oninput="calculate()">
             </div>
         </div>
         
@@ -184,8 +184,8 @@
             </div>
             
             <div class="result-item">
-                <span class="result-label">Duty Rate Increase:</span>
-                <span class="result-value percentage" id="dutyIncrease">0.00%</span>
+                <span class="result-label">Total New Duty Rate (Current + Increase):</span>
+                <span class="result-value percentage" id="totalNewDutyRate">0.00%</span>
             </div>
             
             <div class="target-cost">
@@ -213,8 +213,10 @@
         
         <div class="formula-section">
             <div class="formula-title">Formula Used:</div>
-            Target First Cost = Current Total Cost ÷ (1 + New Duty Rate)<br><br>
-            <strong>Example:</strong> If current cost is $100 with 10% duty (total $110), and new duty is 25%, then:<br>
+            Total New Duty Rate = Current Duty Rate + Additional Duty Rate<br>
+            Target First Cost = Current Total Cost ÷ (1 + Total New Duty Rate)<br><br>
+            <strong>Example:</strong> If current cost is $100 with 10% duty (total $110), and additional duty is 15%, then:<br>
+            Total New Duty Rate = 10% + 15% = 25%<br>
             Target Cost = $110 ÷ 1.25 = $88.00
         </div>
     </div>
@@ -229,24 +231,24 @@
             const currentDutyAmount = currentPrice * (currentDuty / 100);
             const currentTotal = currentPrice + currentDutyAmount;
             
+            // Calculate total new duty rate (original + incremental increase)
+            const totalNewDutyRate = currentDuty + higherDuty;
+            
             // Calculate target first cost to maintain same total cost
-            const targetCost = currentTotal / (1 + (higherDuty / 100));
+            const targetCost = currentTotal / (1 + (totalNewDutyRate / 100));
             
             // Calculate new duty amount at target cost
-            const newDutyAmount = targetCost * (higherDuty / 100);
+            const newDutyAmount = targetCost * (totalNewDutyRate / 100);
             const newTotal = targetCost + newDutyAmount;
             
             // Calculate price reduction needed
             const priceReduction = currentPrice - targetCost;
             const priceReductionPercent = currentPrice > 0 ? (priceReduction / currentPrice) * 100 : 0;
             
-            // Calculate duty increase
-            const dutyIncrease = higherDuty - currentDuty;
-            
             // Update display
             document.getElementById('currentTotal').textContent = `$${currentTotal.toFixed(2)}`;
             document.getElementById('currentDutyAmount').textContent = `$${currentDutyAmount.toFixed(2)}`;
-            document.getElementById('dutyIncrease').textContent = `${dutyIncrease.toFixed(2)}%`;
+            document.getElementById('totalNewDutyRate').textContent = `${totalNewDutyRate.toFixed(2)}%`;
             document.getElementById('targetCost').textContent = `$${targetCost.toFixed(2)}`;
             document.getElementById('newDutyAmount').textContent = `$${newDutyAmount.toFixed(2)}`;
             document.getElementById('newTotal').textContent = `$${newTotal.toFixed(2)}`;
