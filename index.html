@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duty Rate Offset Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            font-weight: 300;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 1.1em;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .results-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+        
+        .result-value {
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+        
+        .target-cost {
+            background: rgba(46, 204, 113, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 2px solid #2ecc71;
+        }
+        
+        .target-cost .result-value {
+            color: #2ecc71;
+            font-size: 1.6em;
+        }
+        
+        .formula-section {
+            background: #ecf0f1;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+        
+        .formula-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .percentage {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .savings {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Duty Rate Offset Calculator</h1>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="currentPrice">Current First Cost ($)</label>
+                <input type="number" id="currentPrice" step="0.01" placeholder="Enter current first cost" oninput="calculate()">
+            </div>
+            
+            <div class="input-group">
+                <label for="currentDuty">Current Duty Rate (%)</label>
+                <input type="number" id="currentDuty" step="0.01" placeholder="Enter current duty rate" oninput="calculate()">
+            </div>
+            
+            <div class="input-group">
+                <label for="higherDuty">New Higher Duty Rate (%)</label>
+                <input type="number" id="higherDuty" step="0.01" placeholder="Enter new higher duty rate" oninput="calculate()">
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <h2 style="margin-top: 0; color: #ecf0f1;">Calculation Results</h2>
+            
+            <div class="result-item">
+                <span class="result-label">Current Total Cost (First Cost + Duty):</span>
+                <span class="result-value" id="currentTotal">$0.00</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Current Duty Amount:</span>
+                <span class="result-value" id="currentDutyAmount">$0.00</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Duty Rate Increase:</span>
+                <span class="result-value percentage" id="dutyIncrease">0.00%</span>
+            </div>
+            
+            <div class="target-cost">
+                <div class="result-item">
+                    <span class="result-label">🎯 Target First Cost to Negotiate:</span>
+                    <span class="result-value" id="targetCost">$0.00</span>
+                </div>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">New Duty Amount (at target cost):</span>
+                <span class="result-value" id="newDutyAmount">$0.00</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">New Total Cost (Target Cost + New Duty):</span>
+                <span class="result-value" id="newTotal">$0.00</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Required Price Reduction:</span>
+                <span class="result-value savings" id="priceReduction">$0.00 (0.00%)</span>
+            </div>
+        </div>
+        
+        <div class="formula-section">
+            <div class="formula-title">Formula Used:</div>
+            Target First Cost = Current Total Cost ÷ (1 + New Duty Rate)<br><br>
+            <strong>Example:</strong> If current cost is $100 with 10% duty (total $110), and new duty is 25%, then:<br>
+            Target Cost = $110 ÷ 1.25 = $88.00
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const currentPrice = parseFloat(document.getElementById('currentPrice').value) || 0;
+            const currentDuty = parseFloat(document.getElementById('currentDuty').value) || 0;
+            const higherDuty = parseFloat(document.getElementById('higherDuty').value) || 0;
+            
+            // Calculate current duty amount and total cost
+            const currentDutyAmount = currentPrice * (currentDuty / 100);
+            const currentTotal = currentPrice + currentDutyAmount;
+            
+            // Calculate target first cost to maintain same total cost
+            const targetCost = currentTotal / (1 + (higherDuty / 100));
+            
+            // Calculate new duty amount at target cost
+            const newDutyAmount = targetCost * (higherDuty / 100);
+            const newTotal = targetCost + newDutyAmount;
+            
+            // Calculate price reduction needed
+            const priceReduction = currentPrice - targetCost;
+            const priceReductionPercent = currentPrice > 0 ? (priceReduction / currentPrice) * 100 : 0;
+            
+            // Calculate duty increase
+            const dutyIncrease = higherDuty - currentDuty;
+            
+            // Update display
+            document.getElementById('currentTotal').textContent = `$${currentTotal.toFixed(2)}`;
+            document.getElementById('currentDutyAmount').textContent = `$${currentDutyAmount.toFixed(2)}`;
+            document.getElementById('dutyIncrease').textContent = `${dutyIncrease.toFixed(2)}%`;
+            document.getElementById('targetCost').textContent = `$${targetCost.toFixed(2)}`;
+            document.getElementById('newDutyAmount').textContent = `$${newDutyAmount.toFixed(2)}`;
+            document.getElementById('newTotal').textContent = `$${newTotal.toFixed(2)}`;
+            document.getElementById('priceReduction').textContent = `$${priceReduction.toFixed(2)} (${priceReductionPercent.toFixed(2)}%)`;
+        }
+        
+        // Initialize calculation
+        calculate();
+    </script>
+</body>
+</html>
