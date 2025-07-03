@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duty Rate Offset Calculator</title>
+    <title>Landed Cost & Duty Rate Calculator</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -30,32 +30,44 @@
             font-weight: 300;
         }
         
+        .input-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
         .input-section {
             background: #f8f9fa;
             border-radius: 15px;
             padding: 25px;
-            margin-bottom: 25px;
             border-left: 5px solid #667eea;
         }
         
+        .input-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.3em;
+        }
+        
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-weight: 600;
             color: #34495e;
-            font-size: 1.1em;
+            font-size: 0.95em;
         }
         
         input {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             border: 2px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 1.1em;
+            border-radius: 8px;
+            font-size: 1em;
             transition: all 0.3s ease;
             box-sizing: border-box;
         }
@@ -74,11 +86,24 @@
             margin-top: 25px;
         }
         
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .result-column h4 {
+            margin-top: 0;
+            color: #ecf0f1;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
         .result-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
+            padding: 10px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
@@ -88,44 +113,34 @@
         
         .result-label {
             font-weight: 500;
-            font-size: 1.1em;
+            font-size: 0.95em;
         }
         
         .result-value {
-            font-size: 1.3em;
+            font-size: 1.1em;
             font-weight: 700;
         }
         
-        .target-cost {
+        .target-section {
             background: rgba(46, 204, 113, 0.2);
             border-radius: 10px;
             padding: 20px;
-            margin-top: 15px;
-            border: 2px solid #2ecc71;
-        }
-        
-        .target-cost .result-value {
-            color: #2ecc71;
-            font-size: 1.6em;
-        }
-        
-        .formula-section {
-            background: #ecf0f1;
-            border-radius: 10px;
-            padding: 20px;
             margin-top: 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            color: #2c3e50;
+            border: 2px solid #2ecc71;
+            grid-column: 1 / -1;
         }
         
-        .formula-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-family: 'Segoe UI', sans-serif;
+        .target-section h4 {
+            color: #2ecc71 !important;
+            margin-top: 0;
         }
         
-        .percentage {
+        .target-section .result-value {
+            color: #2ecc71;
+            font-size: 1.3em;
+        }
+        
+        .profit-impact {
             color: #e74c3c;
             font-weight: bold;
         }
@@ -135,121 +150,228 @@
             font-weight: bold;
         }
         
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            .input-sections {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
             .container {
                 margin: 10px;
                 padding: 20px;
-            }
-            
-            .result-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Duty Rate Offset Calculator</h1>
+        <h1>Landed Cost & Duty Rate Calculator</h1>
         
-        <div class="input-section">
-            <div class="input-group">
-                <label for="originalPrice">Original First Cost ($)</label>
-                <input type="number" id="originalPrice" step="0.01" placeholder="Enter original first cost" oninput="calculate()">
+        <div class="input-sections">
+            <div class="input-section">
+                <h3>Product Costs</h3>
+                <div class="input-group">
+                    <label for="fob">FOB Price ($)</label>
+                    <input type="number" id="fob" step="0.01" placeholder="1.86" oninput="calculate()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="commission">Commission ($)</label>
+                    <input type="number" id="commission" step="0.01" placeholder="0.00" oninput="calculate()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="duty">Current Duty Rate (%)</label>
+                    <input type="number" id="duty" step="0.01" placeholder="3.40" oninput="calculate()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="libDuty">Additional Duty Rate (%)</label>
+                    <input type="number" id="libDuty" step="0.01" placeholder="10.00" oninput="calculate()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="shipping">Shipping ($)</label>
+                    <input type="number" id="shipping" step="0.01" placeholder="0.19" oninput="calculate()">
+                </div>
             </div>
             
-            <div class="input-group">
-                <label for="additionalDuty">Additional Duty Rate (%)</label>
-                <input type="number" id="additionalDuty" step="0.01" placeholder="Enter additional duty rate" oninput="calculate()">
+            <div class="input-section">
+                <h3>Selling & Logistics</h3>
+                <div class="input-group">
+                    <label for="sellPrice">Sell Price ($)</label>
+                    <input type="number" id="sellPrice" step="0.01" placeholder="2.68" oninput="calculate()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="sellUpcharge">Sell Upcharge ($)</label>
+                    <input type="number" id="sellUpcharge" step="0.01" placeholder="0.16" oninput="calculate()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="shippingDocs">Shipping Docs ($)</label>
+                    <input type="number" id="shippingDocs" step="0.01" placeholder="650" oninput="calculate()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="containerCost">20' Container Cost ($)</label>
+                    <input type="number" id="containerCost" step="0.01" placeholder="3200" oninput="calculate()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="inland">Inland ($)</label>
+                    <input type="number" id="inland" step="0.01" placeholder="1350" oninput="calculate()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="shippingQty">Shipping Quantity</label>
+                    <input type="number" id="shippingQty" step="1" placeholder="27000" oninput="calculate()">
+                </div>
             </div>
         </div>
         
         <div class="results-section">
-            <h2 style="margin-top: 0; color: #ecf0f1;">Calculation Results</h2>
+            <h2 style="margin-top: 0; color: #ecf0f1; text-align: center;">Cost Analysis Results</h2>
             
-            <div class="result-item">
-                <span class="result-label">Original First Cost:</span>
-                <span class="result-value" id="originalCost">$0.00</span>
-            </div>
-            
-            <div class="result-item">
-                <span class="result-label">Additional Duty Rate:</span>
-                <span class="result-value percentage" id="dutyRate">0.00%</span>
-            </div>
-            
-            <div class="result-item">
-                <span class="result-label">Additional Duty Amount (at original cost):</span>
-                <span class="result-value" id="additionalDutyAmount">$0.00</span>
-            </div>
-            
-            <div class="target-cost">
-                <div class="result-item">
-                    <span class="result-label">🎯 Target First Cost to Negotiate:</span>
-                    <span class="result-value" id="targetCost">$0.00</span>
+            <div class="results-grid">
+                <div class="result-column">
+                    <h4>Current Scenario</h4>
+                    <div class="result-item">
+                        <span class="result-label">FOB + Commission:</span>
+                        <span class="result-value" id="currentBase">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Current Duty Cost:</span>
+                        <span class="result-value" id="currentDutyCost">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Current LDP:</span>
+                        <span class="result-value" id="currentLDP">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Total Sell Price:</span>
+                        <span class="result-value" id="currentTotalSell">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Current Profit:</span>
+                        <span class="result-value" id="currentProfit">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Current Margin:</span>
+                        <span class="result-value" id="currentMargin">0.00%</span>
+                    </div>
+                </div>
+                
+                <div class="result-column">
+                    <h4>With Additional Duty</h4>
+                    <div class="result-item">
+                        <span class="result-label">Total Duty Rate:</span>
+                        <span class="result-value" id="totalDutyRate">0.00%</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">New Duty Cost:</span>
+                        <span class="result-value" id="newDutyCost">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">New LDP:</span>
+                        <span class="result-value" id="newLDP">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">New Profit:</span>
+                        <span class="result-value profit-impact" id="newProfit">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">New Margin:</span>
+                        <span class="result-value profit-impact" id="newMargin">0.00%</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Profit Impact:</span>
+                        <span class="result-value profit-impact" id="profitImpact">$0.00</span>
+                    </div>
+                </div>
+                
+                <div class="target-section">
+                    <h4>🎯 Target FOB to Maintain Current Profit</h4>
+                    <div class="result-item">
+                        <span class="result-label">Target FOB Price:</span>
+                        <span class="result-value" id="targetFOB">$0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Required FOB Reduction:</span>
+                        <span class="result-value" id="fobReduction">$0.00 (0.00%)</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Per Unit Shipping Cost:</span>
+                        <span class="result-value" id="perUnitShipping">$0.00</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="result-item">
-                <span class="result-label">New Duty Amount (at target cost):</span>
-                <span class="result-value" id="newDutyAmount">$0.00</span>
-            </div>
-            
-            <div class="result-item">
-                <span class="result-label">New Total Cost (Target Cost + New Duty):</span>
-                <span class="result-value" id="newTotal">$0.00</span>
-            </div>
-            
-            <div class="result-item">
-                <span class="result-label">Required Price Reduction:</span>
-                <span class="result-value savings" id="priceReduction">$0.00 (0.00%)</span>
-            </div>
-            
-            <div class="result-item">
-                <span class="result-label">Duty Impact Offset:</span>
-                <span class="result-value savings" id="dutyOffset">$0.00</span>
-            </div>
-        </div>
-        
-        <div class="formula-section">
-            <div class="formula-title">Formula Used:</div>
-            Target First Cost = Original First Cost ÷ (1 + Additional Duty Rate)<br><br>
-            <strong>Example:</strong> If original cost is $1.00 and additional duty is 20%, then:<br>
-            Target Cost = $1.00 ÷ 1.20 = $0.833<br>
-            New duty on $0.833 = $0.167<br>
-            New total = $0.833 + $0.167 = $1.00 (same as original!)
         </div>
     </div>
 
     <script>
         function calculate() {
-            const originalPrice = parseFloat(document.getElementById('originalPrice').value) || 0;
-            const additionalDuty = parseFloat(document.getElementById('additionalDuty').value) || 0;
+            // Get input values
+            const fob = parseFloat(document.getElementById('fob').value) || 0;
+            const commission = parseFloat(document.getElementById('commission').value) || 0;
+            const duty = parseFloat(document.getElementById('duty').value) || 0;
+            const libDuty = parseFloat(document.getElementById('libDuty').value) || 0;
+            const shipping = parseFloat(document.getElementById('shipping').value) || 0;
+            const sellPrice = parseFloat(document.getElementById('sellPrice').value) || 0;
+            const sellUpcharge = parseFloat(document.getElementById('sellUpcharge').value) || 0;
+            const shippingDocs = parseFloat(document.getElementById('shippingDocs').value) || 0;
+            const containerCost = parseFloat(document.getElementById('containerCost').value) || 0;
+            const inland = parseFloat(document.getElementById('inland').value) || 0;
+            const shippingQty = parseFloat(document.getElementById('shippingQty').value) || 1;
             
-            // Calculate target first cost to offset the additional duty
-            const targetCost = originalPrice / (1 + (additionalDuty / 100));
+            // Calculate per unit shipping cost
+            const perUnitShipping = shippingQty > 0 ? (shippingDocs + containerCost + inland) / shippingQty : 0;
             
-            // Calculate duty amounts
-            const additionalDutyAmount = originalPrice * (additionalDuty / 100);
-            const newDutyAmount = targetCost * (additionalDuty / 100);
-            const newTotal = targetCost + newDutyAmount;
+            // Current scenario calculations
+            const currentBase = fob + commission;
+            const currentDutyCost = currentBase * (duty / 100);
+            const currentLDP = currentBase + currentDutyCost + shipping;
+            const currentTotalSell = sellPrice + sellUpcharge;
+            const currentProfit = currentTotalSell - currentLDP;
+            const currentMargin = currentTotalSell > 0 ? (currentProfit / currentTotalSell) * 100 : 0;
             
-            // Calculate price reduction needed
-            const priceReduction = originalPrice - targetCost;
-            const priceReductionPercent = originalPrice > 0 ? (priceReduction / originalPrice) * 100 : 0;
+            // New scenario with additional duty
+            const totalDutyRate = duty + libDuty;
+            const newDutyCost = currentBase * (totalDutyRate / 100);
+            const newLDP = currentBase + newDutyCost + shipping;
+            const newProfit = currentTotalSell - newLDP;
+            const newMargin = currentTotalSell > 0 ? (newProfit / currentTotalSell) * 100 : 0;
+            const profitImpact = newProfit - currentProfit;
             
-            // Calculate duty offset (should equal the duty amount)
-            const dutyOffset = additionalDutyAmount - newDutyAmount;
+            // Target FOB to maintain current profit
+            // Target LDP = Current Total Sell - Current Profit
+            const targetLDP = currentTotalSell - currentProfit;
+            const targetBase = (targetLDP - shipping) / (1 + (totalDutyRate / 100));
+            const targetFOB = targetBase - commission;
+            const fobReduction = fob - targetFOB;
+            const fobReductionPercent = fob > 0 ? (fobReduction / fob) * 100 : 0;
             
             // Update display
-            document.getElementById('originalCost').textContent = `$${originalPrice.toFixed(2)}`;
-            document.getElementById('dutyRate').textContent = `${additionalDuty.toFixed(2)}%`;
-            document.getElementById('additionalDutyAmount').textContent = `$${additionalDutyAmount.toFixed(2)}`;
-            document.getElementById('targetCost').textContent = `$${targetCost.toFixed(2)}`;
-            document.getElementById('newDutyAmount').textContent = `$${newDutyAmount.toFixed(2)}`;
-            document.getElementById('newTotal').textContent = `$${newTotal.toFixed(2)}`;
-            document.getElementById('priceReduction').textContent = `$${priceReduction.toFixed(2)} (${priceReductionPercent.toFixed(2)}%)`;
-            document.getElementById('dutyOffset').textContent = `$${dutyOffset.toFixed(2)}`;
+            document.getElementById('currentBase').textContent = `$${currentBase.toFixed(2)}`;
+            document.getElementById('currentDutyCost').textContent = `$${currentDutyCost.toFixed(2)}`;
+            document.getElementById('currentLDP').textContent = `$${currentLDP.toFixed(2)}`;
+            document.getElementById('currentTotalSell').textContent = `$${currentTotalSell.toFixed(2)}`;
+            document.getElementById('currentProfit').textContent = `$${currentProfit.toFixed(2)}`;
+            document.getElementById('currentMargin').textContent = `${currentMargin.toFixed(2)}%`;
+            
+            document.getElementById('totalDutyRate').textContent = `${totalDutyRate.toFixed(2)}%`;
+            document.getElementById('newDutyCost').textContent = `$${newDutyCost.toFixed(2)}`;
+            document.getElementById('newLDP').textContent = `$${newLDP.toFixed(2)}`;
+            document.getElementById('newProfit').textContent = `$${newProfit.toFixed(2)}`;
+            document.getElementById('newMargin').textContent = `${newMargin.toFixed(2)}%`;
+            document.getElementById('profitImpact').textContent = `$${profitImpact.toFixed(2)}`;
+            
+            document.getElementById('targetFOB').textContent = `$${targetFOB.toFixed(2)}`;
+            document.getElementById('fobReduction').textContent = `$${fobReduction.toFixed(2)} (${fobReductionPercent.toFixed(2)}%)`;
+            document.getElementById('perUnitShipping').textContent = `$${perUnitShipping.toFixed(4)}`;
         }
         
         // Initialize calculation
